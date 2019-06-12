@@ -6,6 +6,9 @@ package com.weichao.exercise.algorithm;
  * @date 2019/6/12 9:36
  */
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 1. 两数之和
  *
@@ -22,7 +25,40 @@ package com.weichao.exercise.algorithm;
  */
 public class TwoSum {
 
-    public int[] twoSum(int[] nums, int target) {
+    public static void main(String[] args) {
+        int[] example = {2,7,11,15};
 
+        int[] result= twoSum(example,9);
+
+        for(int i = 0;i<result.length;i++){
+            System.out.println(result[i]);
+        }
     }
+    public static int[] twoSum(int[] nums, int target) {
+
+        Map<Integer,Integer> map = new HashMap<>();
+        for(int i = 0;i<nums.length;i++){
+            map.put(nums[i],i);
+        }
+
+        for(int i = 0;i<nums.length;i++){
+            int num = target - nums[i];
+            if(map.containsKey(num) && map.get(num) != i){
+                return new int[]{i,map.get(num)};
+            }
+        }
+        throw new IllegalArgumentException("No two sum solution");
+    }
+
+    public int[] twoSum2(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for(int i = 0; i< nums.length; i++) {
+            if(map.containsKey(target - nums[i])) {
+                return new int[] {map.get(target-nums[i]),i};
+            }
+            map.put(nums[i], i);
+        }
+        throw new IllegalArgumentException("No two sum solution");
+    }
+
 }
