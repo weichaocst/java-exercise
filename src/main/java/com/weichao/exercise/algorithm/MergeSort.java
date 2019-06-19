@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 /**
  * 归并算法实现
+ * 最坏时间复杂度：O(nlogn)
+ * 平均时间复杂度：O(nlogn)
+ * 辅助空间：O(n)
  */
 public class MergeSort {
 
