@@ -1,52 +1,53 @@
-package com.weichao.exercise.ioc;
+package com.weichao.exercise.ioc.simplespring;
 
+import com.sun.org.apache.xalan.internal.xsltc.trax.SAX2DOM;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
- * @author weichao
- * @Description
- * @date 2019/4/16 16:18
+ * XML注册读取器
+ * 该类继承了注册读取器接口，并模拟实现了读取注册对象信息的方法
  */
-public class SimpleIOC {
-
-    private Map<String, Object> beanMap = new HashMap<String, Object>();
-
-    public SimpleIOC(String location) throws Exception {
-        loadBeans(location);
-    }
-
-    public Object getBean(String name) {
-
-        Object bean = beanMap.get(name);
-        if (Objects.isNull(bean)) {
-            throw new IllegalArgumentException("there is no bean with name " + name);
-        }
-        return bean;
-    }
+public class XMLSourceReader implements SourceReader{
 
 
-    private void loadBeans(String location) throws Exception {
-
+    @Override
+    public Map<String, BeanInfo> loadBeans(String filePath){
+        Document document = null;
         //加载xml配置文件
-        InputStream inputStream = new FileInputStream(location);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-        Document document = documentBuilder.parse(inputStream);
-        Element root = document.getDocumentElement();
-        NodeList nodeList = root.getChildNodes();
+        try{
+            InputStream inputStream = new FileInputStream(filePath);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+            document = documentBuilder.parse(inputStream);
+        }catch (FileNotFoundException e){
+            throw new RuntimeException(e);
+        } catch (ParserConfigurationException e){
+            throw new RuntimeException(e);
+        } catch (IOException e){
+            throw new RuntimeException(e);
+        } catch (SAXException e){
+            throw new RuntimeException(e);
+        }
 
+        Element root = document.getDocumentElement();
+        //获取所有的Bean标签
+        NodeList nodeList = root.getChildNodes();
+        Map<String,BeanInfo> beans = new HashMap<String,BeanInfo>();
         //遍历<bean>标签
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
@@ -54,11 +55,11 @@ public class SimpleIOC {
                 Element ele = (Element) node;
                 String id = ele.getAttribute("id");
                 String className = ele.getAttribute("class");
+                BeanInfo beanInfo = new BeanInfo();
+                beanInfo.setId(id);
+                beanInfo.setType(className);
 
-                //加载beanClass
-                Class beanClass = Class.forName(className);
-                //创建bean
-                Object bean = beanClass.newInstance();
+                Map<String,Object> properties = beanInfo.getProperties();
                 //遍历<property>标签
                 NodeList propertyNodes = ele.getElementsByTagName("property");
                 for (int j = 0; j < propertyNodes.getLength(); j++) {
@@ -67,31 +68,23 @@ public class SimpleIOC {
                         Element propertyElement = (Element) propertyNode;
                         String name = propertyElement.getAttribute("name");
                         String value = propertyElement.getAttribute("value");
-
-                        Field declaredField = bean.getClass().getDeclaredField(name);
-                        // 利用反射将 bean 相关字段访问权限设为可访问
-                        declaredField.setAccessible(true);
-
                         if (value != null && value.length() > 0) {
-                            // 将属性值填充到相关字段中
-                            declaredField.set(bean, value);
+                            properties.put(name,value);
                         } else {
                             String ref = propertyElement.getAttribute("ref");
                             if (ref == null || ref.length() == 0) {
                                 throw new IllegalArgumentException("ref config error");
                             }
                             // 将引用填充到相关字段中
-                            declaredField.set(bean, getBean(ref));
+                            properties.put(name,beans.get(value));
                         }
+
                     }
                 }
                 // 将 bean 注册到 bean 容器中
-                registerBean(id, bean);
+                beans.put(id, beanInfo);
             }
         }
-    }
-
-    private void registerBean(String id, Object bean) {
-        beanMap.put(id, bean);
+        return beans;
     }
 }
