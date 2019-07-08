@@ -3,6 +3,7 @@ package com.weichao.exercise.algorithm;
 import sun.reflect.generics.tree.Tree;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -175,7 +176,50 @@ public class BinaryTree {
     public List<Integer> rearErgodic2(TreeNode root){
 
         List<Integer> result = new ArrayList<Integer>();
-        rearErgodicHelper(root,result);
+
+        if(root == null){
+            return result;
+        }
+        Stack<TreeNode> treeNodeStack = new Stack<TreeNode>();
+        TreeNode h = root;
+        TreeNode c = null;
+        while (h != null || !treeNodeStack.isEmpty()){
+            if(h != null){
+                treeNodeStack.push(h);
+                h = h.left;
+            }else {
+                TreeNode peek = treeNodeStack.peek();
+                if(peek.right != null && peek.right != c){
+                    h = peek.right;
+                } else {
+                    peek = treeNodeStack.pop();
+                    result.add(peek.val);
+
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 二叉树的层次遍历
+     * @param root
+     * @return
+     */
+    List<Integer> levelTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<Integer>();
+        if (root == null)
+            return result;
+        LinkedList<TreeNode> queue = new LinkedList<TreeNode>();
+        queue.addLast(root);
+        while (queue.size() != 0) {
+            TreeNode node = queue.pollFirst();
+            result.add(node.val);
+            if (node.left != null)
+                queue.addLast(node.left);
+            if (node.right != null)
+                queue.addLast(node.right);
+        }
         return result;
     }
 }
