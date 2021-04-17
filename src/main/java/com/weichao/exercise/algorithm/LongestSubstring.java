@@ -1,10 +1,6 @@
 package com.weichao.exercise.algorithm;
 
-import com.alibaba.druid.sql.visitor.functions.Char;
-
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,25 +52,5 @@ public class LongestSubstring {
         return true;
      }
 
-    /**
-     * 滑动窗口法
-     * @param s
-     * @return
-     * 当输入" "时，应该输出1
-     */
-    public int lengthOfLongestSubstring2(String s) {
 
-       int n = s.length();
-       int ans = 0, i = 0, j = 0;
-       Set<Character> set = new HashSet<>();
-       while (i < n && j < n){
-           if(!set.contains(s.charAt(j))){
-               set.add(s.charAt(j++));
-               ans = Math.max(ans,j - i);
-           } else {
-               set.remove(s.charAt(i++));
-           }
-       }
-       return ans;
-    }
 }
