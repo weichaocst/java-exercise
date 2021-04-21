@@ -8,16 +8,56 @@ package com.weichao.exercise.algorithm;
  */
 public class LongestPalindrome {
 
+    public static void main(String[] args) {
+        System.out.println(longestPalindromeOneSelf("ccc"));
+    }
+
+
+    /**
+     * 自己的解法；击败了5%的用户
+     *
+     * @param str
+     * @return
+     */
+    public static String longestPalindromeOneSelf(String str) {
+        if (str == null || str.length() == 0) {
+            return null;
+        }
+        StringBuffer sb = new StringBuffer(str);
+
+        String result = null;
+        for (int i = 0; i < sb.length(); i++) {
+            int left = i - 1, right = i + 1;
+            String s = String.valueOf(sb.charAt(i));
+            while (left >= 0 && right < sb.length()) {
+                if (sb.charAt(left) == sb.charAt(right)) {
+                    s = sb.charAt(left) + s + sb.charAt(right);
+                    if (s.length() > result.length()) {
+                        result = s;
+                    }
+                    left--;
+                    right++;
+                    continue;
+                }
+                break;
+            }
+            if (result == null) {
+                result = s;
+            }
+        }
+        return result;
+    }
 
     /**
      * 中心扩展法解决最长回文串问题
      * 时间复杂度：o(n2)
      * 空间复杂度：o(1)
+     *
      * @param str
      */
-    public int palindrome(String str){
+    public int palindrome(String str) {
 
-        if(str == null || str.length() == 0){
+        if (str == null || str.length() == 0) {
             return 0;
         }
         StringBuffer sb = new StringBuffer(str);
