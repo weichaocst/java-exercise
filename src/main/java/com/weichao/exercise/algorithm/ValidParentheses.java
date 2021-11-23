@@ -22,7 +22,7 @@ public class ValidParentheses {
 
     public static boolean isValid(String s) {
         char[] array = s.toCharArray();
-        Stack<String> stringStack = new Stack<>();
+        Stack<String> stringStack = new Stack<String>();
         for (char c : array) {
             String cs = String.valueOf(c);
             if (leftMap.containsKey(cs)) {
